@@ -1,4 +1,4 @@
-const bindings: any = require("../bindings");
+import bindings from "../bindings";
 import { curve, ec as EC } from "elliptic";
 import {
   BigInt,

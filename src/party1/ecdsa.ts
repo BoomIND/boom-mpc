@@ -1,4 +1,4 @@
-import { bindings } from "../bindings";
+import bindings from "../bindings";
 import {
   BigInt,
   DecryptionKey,
