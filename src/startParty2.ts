@@ -1,5 +1,6 @@
 import { EcdsaParty2, EcdsaParty2Share } from ".";
 import express from "express";
+import ServerlessHttp from "serverless-http";
 
 const PORT = process.env.PORT ?? 3005;
 const P1_ENDPOINT = process.env.P1_ENDPOINT ?? "http://localhost:8000";
@@ -29,13 +30,14 @@ async function generateTwoPartyEcdsaSignature(msg: string) {
 
 const app = express();
 app.use(express.json());
+app.get("/health", async (req, res) => {
+  res.json({});
+});
 app.post("/", async (req, res) => {
   const { msg } = req.body;
   const signature = await generateTwoPartyEcdsaSignature(msg);
   res.json(signature);
 });
 
-init();
-app.listen(PORT, () => {
-  console.log(`MPC party 2 server listening on port ${PORT}`);
-});
+// init();
+export const handler = ServerlessHttp(app);

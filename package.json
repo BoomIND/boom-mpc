@@ -5,7 +5,7 @@
   "main": "./dist/src/index.js",
   "types": "./dist/types/index.d.ts",
   "scripts": {
-    "build-rs": "cargo-cp-artifact -nc ./native/index.node -- cargo build --message-format=json-render-diagnostics --manifest-path=./native/Cargo.toml",
+    "build-rs": "cargo-cp-artifact -nc ./native/index.node -- cargo build --message-format=json-render-diagnostics --manifest-path=./native/Cargo.toml --release",
     "build-debug": "npm run build --",
     "build-release": "npm run build -- --release",
     "test": "cargo test",
@@ -13,10 +13,10 @@
     "build": "npm run build-rs && npm run build-ts",
     "clean": "rm -rf dist",
     "watch-ts": "tsc -w",
-    "start-party1": "nodemon dist/src/start-party1.js",
-    "start-party2": "nodemon dist/src/start-party2.js",
-    "watch-party2": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run start-party2\"",
-    "watch-party1": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run start-party1\""
+    "start-party1": "node dist/src/startParty1.js",
+    "start-party2": "node dist/src/startParty2.js",
+    "watch-party2": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run startParty2\"",
+    "watch-party1": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run startParty1\""
   },
   "author": "",
   "license": "ISC",
@@ -31,7 +31,8 @@
   "dependencies": {
     "@types/elliptic": "^6.4.9",
     "elliptic": "^6.5.1",
-    "express": "^4.18.1"
+    "express": "^4.18.1",
+    "serverless-http": "^3.0.2"
   },
   "engines": {
     "node": "^12.0.0"

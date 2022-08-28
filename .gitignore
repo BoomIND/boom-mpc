@@ -5,3 +5,6 @@ index.node
 npm-debug.log*
 dist
 db
+.serverless
+data.db
+temp-dir
