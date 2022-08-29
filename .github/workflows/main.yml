@@ -16,11 +16,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      # - uses: satackey/action-docker-layer-caching@v0.0.11
-      #   # Ignore the failure of a step and avoid terminating the job.
-      #   continue-on-error: true
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        # Ignore the failure of a step and avoid terminating the job.
+        continue-on-error: true
+      - run: npm i -g serverless@3.x
       - run: |
-          npm i -g serverless@3.x
           serverless deploy
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
