@@ -6,6 +6,8 @@ custom:
 
 provider:
   name: aws
+  httpApi:
+    disableDefaultEndpoint: true
   ecr:
     images:
       baseimage:
