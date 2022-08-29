@@ -31,15 +31,15 @@ async function generateTwoPartyEcdsaSignature(msg: string) {
 const app = express();
 app.use(express.json());
 app.get("/party2/health", async (req, res) => {
-  await init()
   res.json({});
 });
 app.post("/party2", async (req, res) => {
-  await init()
   const { msg } = req.body;
   const signature = await generateTwoPartyEcdsaSignature(msg);
   res.json(signature);
 });
 
-// init();
-export const handler = ServerlessHttp(app);
+init();
+app.listen(PORT, () => {
+  console.log('started')
+})

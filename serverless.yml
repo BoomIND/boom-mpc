@@ -2,7 +2,7 @@ service: mpc-express-serverless
 frameworkVersion: '3'
 
 custom:
-  tableName: 'users-table-${sls:stage}'
+  tableName: '${sls:stage}_Party1MasterKey'
 
 provider:
   name: aws
@@ -52,9 +52,6 @@ functions:
       - npm
       - run
       - start-party1
-    environment:
-      AWS_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${env:AWS_ACCESS_KEY_ID}
     events:
       - httpApi:
           method: '*'
@@ -62,14 +59,173 @@ functions:
 
 resources:
   Resources:
-    UsersTable:
+    KeyGenFirstMsg:
       Type: AWS::DynamoDB::Table
       Properties:
-        AttributeDefinitions:
-          - AttributeName: userId
-            AttributeType: S
         KeySchema:
-          - AttributeName: userId
+          - AttributeName: id
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
-        TableName: ${self:custom.tableName}
+        TableName: '${sls:stage}-gotham-KeyGenFirstMsg'
+    
+    CommWitness:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: '${sls:stage}-gotham-CommWitness'
+    
+    EcKeyPair:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: '${sls:stage}-gotham-EcKeyPair'
+    
+    PaillierKeyPair:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: '${sls:stage}-gotham-PaillierKeyPair'
+    
+    Party1Private:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: '${sls:stage}-gotham-Party1Private'
+    
+    Party2Public:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: '${sls:stage}-gotham-Party2Public'
+    
+    PDLProver:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: '${sls:stage}-gotham-PDLProver'
+    
+    PDLDecommit:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: '${sls:stage}-gotham-PDLDecommit'
+    
+    Alpha:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: '${sls:stage}-gotham-Alpha'
+    
+    Party2PDLFirstMsg:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: '${sls:stage}-gotham-Party2PDLFirstMsg'
+    
+    CCKeyGenFirstMsg:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: '${sls:stage}-gotham-CCKeyGenFirstMsg'
+    
+    CCCommWitness:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: '${sls:stage}-gotham-CCCommWitness'
+    
+    CCEcKeyPair:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: '${sls:stage}-gotham-CCEcKeyPair'
+    
+    CC:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: '${sls:stage}-gotham-CC'
+    
+    EphEcKeyPair:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: '${sls:stage}-gotham-EphEcKeyPair'
+    
+    EphKeyGenFirstMsg:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: '${sls:stage}-gotham-EphKeyGenFirstMsg'
+    
+    EphKeyGenFirstMsg:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: '${sls:stage}-gotham-EphKeyGenFirstMsg'
+    
+    POS:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: '${sls:stage}-gotham-POS'
+    
+    Party1MasterKey:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: customerId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: '${sls:stage}_Party1MasterKey'
