@@ -40,9 +40,11 @@ functions:
         - run
         - start-party2
     events:
-      - httpApi: '*'
+      - httpApi:
+          method: '*'
+          path: /party2
     environment:
-      P1_ENDPOINT: https://l.boom.fan
+      P1_ENDPOINT: https://l.boom.fan/party1
   rust_api:
     image:
       name: baseimage
@@ -51,7 +53,9 @@ functions:
       - run
       - start-party1
     events:
-      - httpApi: '*'
+      - httpApi:
+          method: '*'
+          path: /party1
 
 resources:
   Resources:
