@@ -10,7 +10,7 @@ provider:
     images:
       baseimage:
         path: ./
-        platform: linux/arm64/v8
+        platform: linux/amd64
   region: ap-south-1
   deploymentMethod: direct
   iam:
