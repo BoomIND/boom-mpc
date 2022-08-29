@@ -41,6 +41,8 @@ functions:
         - start-party2
     events:
       - httpApi: '*'
+    environment:
+      P1_ENDPOINT: https://l.boom.fan
   rust_api:
     image:
       name: baseimage
