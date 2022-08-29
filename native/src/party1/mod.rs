@@ -20,11 +20,13 @@ pub fn launch_server(mut cx: FunctionContext) -> JsResult<JsPromise> {
     let channel = cx.channel();
     let (deferred, promise) = cx.promise();
     rt.spawn(async move {
-        let settings = HashMap::new();
+        let mut settings = HashMap::new();
+        settings.insert("db".to_string(), "aws".to_string());
+        settings.insert("aws_region".to_string(), "ap-south-1".to_string());
+
         let rsp = get_server(settings).launch().await;
         deferred.settle_with(&channel, move |mut cx| {
             let _r = rsp.or_else(|err| cx.throw_error(err.to_string()));
-
             Ok(cx.string("success"))
         });
     });

@@ -30,10 +30,10 @@ async function generateTwoPartyEcdsaSignature(msg: string) {
 
 const app = express();
 app.use(express.json());
-app.get("/health", async (req, res) => {
+app.get("/party2/health", async (req, res) => {
   res.json({});
 });
-app.post("/", async (req, res) => {
+app.post("/party2", async (req, res) => {
   const { msg } = req.body;
   const signature = await generateTwoPartyEcdsaSignature(msg);
   res.json(signature);
