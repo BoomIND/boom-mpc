@@ -1,3 +1,5 @@
+#![feature(proc_macro_hygiene, decl_macro)]
+
 extern crate server_lib;
 
 use std::collections::HashMap;
@@ -6,6 +8,8 @@ use self::server_lib::server::*;
 use neon::prelude::*;
 use once_cell::sync::OnceCell;
 use tokio::runtime::Runtime;
+
+use lambda_web::{is_running_on_lambda, launch_rocket_on_lambda, LambdaError};
 
 // Return a global tokio runtime or create one if it doesn't exist.
 // Throws a JavaScript exception if the `Runtime` fails to create.
@@ -23,8 +27,26 @@ pub fn launch_server(mut cx: FunctionContext) -> JsResult<JsPromise> {
         let mut settings = HashMap::new();
         settings.insert("db".to_string(), "aws".to_string());
         settings.insert("aws_region".to_string(), "ap-south-1".to_string());
+        let rsp = launch_rocket_on_lambda(get_server(settings)).await;
+        deferred.settle_with(&channel, move |mut cx| {
+            let _r = rsp.or_else(|err| cx.throw_error(err.to_string()));
+            Ok(cx.string("success"))
+        });
+    });
+    Ok(promise)
+}
+
+pub fn launch_server_regular(mut cx: FunctionContext) -> JsResult<JsPromise> {
+    let rt = runtime(&mut cx)?;
+    let channel = cx.channel();
+    let (deferred, promise) = cx.promise();
+    rt.spawn(async move {
+        let mut settings = HashMap::new();
+        settings.insert("db".to_string(), "aws".to_string());
+        settings.insert("aws_region".to_string(), "ap-south-1".to_string());
 
         let rsp = get_server(settings).launch().await;
+
         deferred.settle_with(&channel, move |mut cx| {
             let _r = rsp.or_else(|err| cx.throw_error(err.to_string()));
             Ok(cx.string("success"))
