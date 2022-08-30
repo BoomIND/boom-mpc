@@ -1,11 +1,21 @@
 import { EcdsaParty2, EcdsaParty2Share } from ".";
-import express from "express";
+import express, { Request, Response } from "express";
 import ServerlessHttp from "serverless-http";
 
 const PORT = process.env.PORT ?? 3005;
 const P1_ENDPOINT = process.env.P1_ENDPOINT ?? "http://localhost:8000";
 
 let party2ChildShare: EcdsaParty2Share, party2: EcdsaParty2;
+
+class HttpException extends Error {
+  public status: number;
+  public message: string;
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+    this.message = message;
+  }
+}
 
 const init = async () => {
   try {
@@ -31,14 +41,34 @@ async function generateTwoPartyEcdsaSignature(msg: string) {
 const app = express();
 app.use(express.json());
 app.get("/party2/health", async (req, res) => {
-  await init()
+  // await init();
   res.json({});
 });
 app.post("/party2", async (req, res) => {
-  await init()
+  await init();
   const { msg } = req.body;
   const signature = await generateTwoPartyEcdsaSignature(msg);
   res.json(signature);
+});
+
+app.use(async (req, res, next) => {
+  var err = new HttpException(404, "Not Found");
+  next(err);
+});
+
+app.use(function (
+  err: HttpException,
+  req: Request,
+  res: Response,
+  next: Function
+) {
+  res.status(err.status || 500);
+  res.json({
+    errors: {
+      message: err.message,
+      error: {},
+    },
+  });
 });
 
 // init();
