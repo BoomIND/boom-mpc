@@ -1,13 +1,17 @@
-FROM lukemathwalker/cargo-chef:latest-rust-1.57.0-bullseye as node-base
+FROM amazonlinux:2 as node-base
 
 # Install node
-RUN apt update && apt -y install curl dirmngr apt-transport-https lsb-release ca-certificates
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
-RUN apt update && apt install -y nodejs
+RUN curl -sL https://rpm.nodesource.com/setup_12.x | bash - && \
+  yum install -y nodejs && yum clean all
 
 FROM node-base as rust-node-base
+# Install rust
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable && \
+  PATH="/root/.cargo/bin:$PATH" rustup install 1.57.0
+ENV PATH $PATH:/root/.cargo/bin
 
-RUN apt install -y make build-essential pkg-config openssl libssl-dev libreadline-dev libsqlite3-dev clang libgmp-dev
+RUN yum install -y make gcc gcc-c++ libgcc openssl openssl-devel readline-devel sqlite-devel clang gmp gmp-devel && yum clean all
+RUN cargo install cargo-chef
 
 RUN npm i -g neon-cli
 RUN npm install -g cargo-cp-artifact

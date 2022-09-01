@@ -65,6 +65,8 @@ functions:
           path: /party2
     environment:
       P1_ENDPOINT: https://l.boom.fan/party1
+      OPENSSL_STATIC: yes
+      OPENSSL_LIB_DIR: /etc/pki/tls
   rust_api:
     image:
       name: baseimage
@@ -76,6 +78,9 @@ functions:
       - httpApi:
           method: "*"
           path: /party1/ping
+    environment:
+      OPENSSL_STATIC: yes
+      OPENSSL_LIB_DIR: /etc/pki/tls
 
 resources:
   Resources:
