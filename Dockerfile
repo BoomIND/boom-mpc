@@ -25,8 +25,6 @@ RUN cargo chef cook --release --recipe-path recipe.json
 WORKDIR /dist
 
 COPY ./native native
-ENV OPENSSL_STATIC=yes
-ENV OPENSSL_LIB_DIR=/etc/pki/tls
 RUN cargo-cp-artifact -ac mpc ./native/index.node -- cargo build --message-format=json-render-diagnostics --manifest-path=./native/Cargo.toml --release
 RUN ls ./native/
 
@@ -42,8 +40,6 @@ RUN npm install
 
 COPY src src
 COPY tsconfig.json tsconfig.json
-ENV OPENSSL_STATIC=yes
-ENV OPENSSL_LIB_DIR=/etc/pki/tls
 RUN npm run build-ts
 
-CMD [ "npm", "run", "start-party1"]
+CMD [ "npm", "run", "start-party2"]
