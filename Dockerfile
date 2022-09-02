@@ -41,5 +41,7 @@ RUN npm install
 COPY src src
 COPY tsconfig.json tsconfig.json
 RUN npm run build-ts
+RUN npm install aws-lambda-ric
 
-CMD [ "dist/src/startParty2.handler" ]
+ENTRYPOINT ["/usr/local/bin/npx", "aws-lambda-ric"]
+CMD [ "/dist/src/startParty2.handler" ]
