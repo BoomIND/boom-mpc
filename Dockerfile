@@ -29,6 +29,14 @@ RUN cargo-cp-artifact -ac mpc ./native/index.node -- cargo build --message-forma
 RUN ls ./native/
 
 FROM node-base as rust-node-final
+# needed for aws runtime
+RUN apt-get update && apt install -y \ 
+    g++ \
+    make \
+    cmake \
+    unzip \
+    libcurl4-openssl-dev
+RUN npm install aws-lambda-ric
 
 WORKDIR /dist
 RUN mkdir -p native
@@ -41,7 +49,6 @@ RUN npm install
 COPY src src
 COPY tsconfig.json tsconfig.json
 RUN npm run build-ts
-RUN npm install aws-lambda-ric
 
 ENTRYPOINT ["/usr/local/bin/npx", "aws-lambda-ric"]
 CMD [ "/dist/src/startParty2.handler" ]
