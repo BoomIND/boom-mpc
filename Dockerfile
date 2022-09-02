@@ -50,5 +50,8 @@ COPY src src
 COPY tsconfig.json tsconfig.json
 RUN npm run build-ts
 
+ENV RUST_BACKTRACE 1
+RUN RUST_LOG debug
+
 ENTRYPOINT ["npx", "aws-lambda-ric"]
 CMD [ "/dist/src/startParty2.handler" ]
