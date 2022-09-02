@@ -22,8 +22,12 @@ const init = async () => {
   try {
     console.log("Initializing...");
     party2 = new EcdsaParty2(P1_ENDPOINT);
+    let t = Date.now();
     const party2MasterKeyShare = await party2.generateMasterKey();
+    console.log(`generateMasterKey took ${Date.now() - t}`)
+    t = Date.now();
     party2ChildShare = party2.getChildShare(party2MasterKeyShare, 0, 0);
+    console.log(`getChildShare took ${Date.now() - t}`)
     console.log(party2ChildShare.getPublicKey().encode("hex", false));
     console.log("Initialized...");
   } catch (error) {
@@ -46,9 +50,13 @@ app.get("/health", async (req, res) => {
   res.json({});
 });
 app.post("/", async (req, res) => {
+  let t = Date.now();
   await init();
+  console.log(`init took took ${Date.now() - t}`)
   const { msg } = req.body;
+  t = Date.now()
   const signature = await generateTwoPartyEcdsaSignature(msg);
+  console.log(`signing took ${Date.now() - t}`)
   res.json(signature);
 });
 
