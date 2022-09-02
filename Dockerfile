@@ -36,7 +36,6 @@ RUN apt-get update && apt install -y \
     cmake \
     unzip \
     libcurl4-openssl-dev
-RUN npm install aws-lambda-ric
 
 WORKDIR /dist
 RUN mkdir -p native
@@ -45,10 +44,11 @@ COPY --from=rust-build /dist/native/index.node ./native/
 COPY package.json package.json
 COPY package-lock.json package-lock.json
 RUN npm install
+RUN npm install aws-lambda-ric
 
 COPY src src
 COPY tsconfig.json tsconfig.json
 RUN npm run build-ts
 
-ENTRYPOINT ["/usr/local/bin/npx", "aws-lambda-ric"]
+ENTRYPOINT ["npx", "aws-lambda-ric"]
 CMD [ "/dist/src/startParty2.handler" ]
