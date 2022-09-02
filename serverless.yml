@@ -18,6 +18,7 @@ plugins:
 
 provider:
   name: aws
+  timeout: 15
   httpApi:
     disableDefaultEndpoint: true
   ecr:
