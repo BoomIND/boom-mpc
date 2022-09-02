@@ -41,11 +41,11 @@ async function generateTwoPartyEcdsaSignature(msg: string) {
 
 const app = express();
 app.use(express.json());
-app.get("/party2/health", async (req, res) => {
+app.get("/health", async (req, res) => {
   // await init();
   res.json({});
 });
-app.post("/party2", async (req, res) => {
+app.post("/", async (req, res) => {
   await init();
   const { msg } = req.body;
   const signature = await generateTwoPartyEcdsaSignature(msg);
