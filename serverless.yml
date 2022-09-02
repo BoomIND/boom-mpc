@@ -65,9 +65,7 @@ functions:
     image:
       name: party2_server
       command:
-        - npm
-        - run
-        - start-party2
+        - dist/src/startParty2.handler
     events:
       - httpApi: '*'
     environment:

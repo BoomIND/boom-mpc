@@ -1,4 +1,4 @@
-console.log('All envs are ', process.env)
+// console.log('All envs are ', process.env)
 import { EcdsaParty2, EcdsaParty2Share } from ".";
 import express, { Request, Response } from "express";
 import ServerlessHttp from "serverless-http";

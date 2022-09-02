@@ -42,4 +42,4 @@ COPY src src
 COPY tsconfig.json tsconfig.json
 RUN npm run build-ts
 
-CMD [ "npm", "run", "start-party2"]
+CMD [ "dist/src/startParty2.handler" ]
