@@ -41,6 +41,11 @@ provider:
             - dynamodb:DeleteItem
           Resource:
             - "arn:aws:dynamodb:*:*:table/${sls:stage}-party2-secrets"
+        - Effect: Allow
+          Action:
+            - kms:GenerateDataKey
+          Resource:
+            - "arn:aws:kms:*:*:key/ffcd187a-801a-4991-9a3a-f0370be7eefe"
   environment:
     USERS_TABLE: ${self:custom.tableName}
 
