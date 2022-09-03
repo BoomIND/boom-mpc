@@ -74,10 +74,10 @@ app.post("/generateKey", async (req, res) => {
     secret: JSON.stringify(masterKey),
   });
   const hex = party2ChildShare.getPublicKey().encode("hex", false);
-  return {
+  res.json({
     publicKey: hex,
     id: party2ChildShare.id,
-  };
+  });
 });
 
 app.post("/fetchPublicKey", async (req, res, next) => {
