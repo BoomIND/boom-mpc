@@ -44,6 +44,7 @@ provider:
         - Effect: Allow
           Action:
             - kms:GenerateDataKey
+            - kms:Decrypt
           Resource:
             - "arn:aws:kms:*:*:key/ffcd187a-801a-4991-9a3a-f0370be7eefe"
   environment:
