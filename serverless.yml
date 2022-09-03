@@ -28,36 +28,19 @@ provider:
         platform: linux/amd64
   region: ap-south-1
   deploymentMethod: direct
-  # iam:
-  #   role:
-  #     statements:
-  #       - Effect: Allow
-  #         Action:
-  #           - dynamodb:Query
-  #           - dynamodb:Scan
-  #           - dynamodb:GetItem
-  #           - dynamodb:PutItem
-  #           - dynamodb:UpdateItem
-  #           - dynamodb:DeleteItem
-  #         Resource:
-  #           - "arn:aws:dynamodb:*:*:table/${sls:stage}-gotham-KeyGenFirstMsg"
-  #           - "arn:aws:dynamodb:*:*:table/${sls:stage}-gotham-CommWitness"
-  #           - "arn:aws:dynamodb:*:*:table/${sls:stage}-gotham-EcKeyPair"
-  #           - "arn:aws:dynamodb:*:*:table/${sls:stage}-gotham-PaillierKeyPair"
-  #           - "arn:aws:dynamodb:*:*:table/${sls:stage}-gotham-Party1Private"
-  #           - "arn:aws:dynamodb:*:*:table/${sls:stage}-gotham-Party2Public"
-  #           - "arn:aws:dynamodb:*:*:table/${sls:stage}-gotham-PDLProver"
-  #           - "arn:aws:dynamodb:*:*:table/${sls:stage}-gotham-PDLDecommit"
-  #           - "arn:aws:dynamodb:*:*:table/${sls:stage}-gotham-Alpha"
-  #           - "arn:aws:dynamodb:*:*:table/${sls:stage}-gotham-Party2PDLFirstMsg"
-  #           - "arn:aws:dynamodb:*:*:table/${sls:stage}-gotham-CCKeyGenFirstMsg"
-  #           - "arn:aws:dynamodb:*:*:table/${sls:stage}-gotham-CCCommWitness"
-  #           - "arn:aws:dynamodb:*:*:table/${sls:stage}-gotham-CCEcKeyPair"
-  #           - "arn:aws:dynamodb:*:*:table/${sls:stage}-gotham-CC"
-  #           - "arn:aws:dynamodb:*:*:table/${sls:stage}-gotham-EphEcKeyPair"
-  #           - "arn:aws:dynamodb:*:*:table/${sls:stage}-gotham-EphKeyGenFirstMsg"
-  #           - "arn:aws:dynamodb:*:*:table/${sls:stage}-gotham-POS"
-  #           - "arn:aws:dynamodb:*:*:table/${sls:stage}_Party1MasterKey"
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - "arn:aws:dynamodb:*:*:table/${sls:stage}-party2-secrets"
   environment:
     USERS_TABLE: ${self:custom.tableName}
 
@@ -71,3 +54,21 @@ functions:
       - httpApi: '*'
     environment:
       P1_ENDPOINT: https://p1.boom.fan/
+
+resources:
+  Resources:
+    Party2Secrets:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        KeySchema:
+          - AttributeName: name
+            KeyType: HASH
+          - AttributeName: version
+            KeyType: RANGE
+        AttributeDefinitions:
+          - AttributeName: name
+            AttributeType: S
+          - AttributeName: version
+            AttributeType: S
+        BillingMode: PAY_PER_REQUEST
+        TableName: "${sls:stage}-party2-secrets"

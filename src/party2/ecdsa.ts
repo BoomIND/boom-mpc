@@ -51,6 +51,10 @@ export class EcdsaParty2Share {
     const keyPair = ec.keyFromPublic(pub);
     return keyPair.getPublic();
   }
+
+  public getPrivateKey(): Party2MasterKey {
+    return this.master_key
+  }
 }
 
 export class EcdsaSignature {
@@ -117,9 +121,7 @@ export class EcdsaParty2 {
         stringifyHex(xPos),
         stringifyHex(yPos)
       );
-      console.log(res);
       res = await res;
-      console.log(res);
       return EcdsaSignature.fromPlain(JSON.parse(res));
     } catch (err) {
       console.error(err);
