@@ -6,9 +6,10 @@
     "outDir": "./dist/src",
     "rootDir": "./src",/* Redirect output structure to the directory. */
     "composite": true,                     /* Enable project compilation */
-    "strict": true,                           /* Enable all strict type-checking options. */
+    "strict": false,                           /* Enable all strict type-checking options. */
     "strictPropertyInitialization": false,
-    "esModuleInterop": true                  /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+    "esModuleInterop": true,                  /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+    "allowJs": true,
   },
   "include": [
     "src"

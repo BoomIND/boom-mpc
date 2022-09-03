@@ -6,8 +6,9 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
 /// <reference types="node"/>
-import {DynamoDBClientConfig} from '@aws-sdk/client-dynamodb';
-import {KMSClientConfig} from '@aws-sdk/client-kms';
+import {AttributeValue, DeleteItemOutput, DynamoDBClientConfig, PutItemOutput} from '@aws-sdk/client-dynamodb';
+import {DecryptResponse, KMSClientConfig} from '@aws-sdk/client-kms';
+
 
 interface CredStashConfig {
   table?: string;
@@ -33,15 +34,15 @@ export class CredStash {
   constructor(config: CredStashConfig);
   getHighestVersion: (options: {
     name: string;
-  }) => Promise<AWS.DynamoDB.AttributeMap>;
+  }) => Promise<AttributeValue>;
   incrementVersion: (options: {name: string}) => Promise<string>;
   putSecret: (
     options: PutSecretOptions,
-  ) => Promise<AWS.DynamoDB.DocumentClient.PutItemOutput>;
+  ) => Promise<PutItemOutput>;
   decryptStash: (
     stash: {key: string},
     context?: CredStashContext,
-  ) => Promise<AWS.KMS.DecryptResponse>;
+  ) => Promise<DecryptResponse>;
   getAllVersions: (options: {
     name: string;
     context?: CredStashContext;
@@ -54,11 +55,11 @@ export class CredStash {
   }) => Promise<string>;
   deleteSecrets: (options: {
     name: string;
-  }) => Promise<AWS.DynamoDB.DocumentClient.DeleteItemOutput[]>;
+  }) => Promise<DeleteItemOutput[]>;
   deleteSecret: (options: {
     name: string;
     version: number;
-  }) => Promise<AWS.DynamoDB.DocumentClient.DeleteItemOutput>;
+  }) => Promise<DeleteItemOutput>;
   listSecrets: () => Promise<string[]>;
   getAllSecrets: (options: {
     version?: number;
