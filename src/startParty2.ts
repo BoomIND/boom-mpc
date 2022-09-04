@@ -56,14 +56,12 @@ app.post("/sign", async (req, res, next) => {
     next(new HttpException(404, "Not Found"));
     return;
   }
-  const party2ChildShare = EcdsaParty2Share.fromPlain({
+  const party2MasterShare = EcdsaParty2Share.fromPlain({
     id: keyId,
     master_key: JSON.parse(key),
   });
-  const signature = await generateTwoPartyEcdsaSignature(
-    msg,
-    party2.getChildShare(party2ChildShare, 0, 0)
-  );
+  const signature = await party2.sign(msg, party2ChildShare, 0, 0);
+  console.log(JSON.stringify(signature));
   res.json({
     r: signature.r,
     s: signature.s,
@@ -75,7 +73,7 @@ app.post("/generateKey", async (req, res) => {
   const { chainPath } = req.body;
   const party2MasterKeyShare = await generateOrFetchPart2MasterKey();
   const party2ChildShare = party2.getChildShare(party2MasterKeyShare, 0, 0);
-  const masterKey = party2ChildShare.getPrivateKey();
+  const masterKey = party2MasterKeyShare.getPrivateKey();
   await credStash.putSecret({
     name: party2ChildShare.id,
     secret: JSON.stringify(masterKey),
