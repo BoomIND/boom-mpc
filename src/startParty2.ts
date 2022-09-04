@@ -35,11 +35,6 @@ async function generateTwoPartyEcdsaSignature(
   // {"r": <32-bytes-hex>,"s": <32-bytes-hex>,"recid": <0 or 1>}
 }
 
-async function generateOrFetchPart2MasterKey() {
-  const party2MasterKeyShare = await party2.generateMasterKey();
-  return party2MasterKeyShare;
-}
-
 const app = express();
 app.use(express.json());
 
@@ -56,12 +51,17 @@ app.post("/sign", async (req, res, next) => {
     next(new HttpException(404, "Not Found"));
     return;
   }
-  console.log("key", JSON.parse(key))
+  console.log("key", JSON.parse(key));
   const party2MasterShare = EcdsaParty2Share.fromPlain({
     id: keyId,
     master_key: JSON.parse(key),
   });
-  const signature = await party2.sign(msg, party2MasterShare, 0, 0);
+  const signature = await party2.sign(
+    msg,
+    party2.getChildShare(party2MasterShare, 0, 0),
+    0,
+    0
+  );
   console.log(JSON.stringify(signature));
   res.json({
     r: signature.r,
@@ -72,14 +72,14 @@ app.post("/sign", async (req, res, next) => {
 
 app.post("/generateKey", async (req, res) => {
   const { chainPath } = req.body;
-  const party2MasterKeyShare = await generateOrFetchPart2MasterKey();
+  const party2MasterKeyShare = await party2.generateMasterKey();
   const party2ChildShare = party2.getChildShare(party2MasterKeyShare, 0, 0);
   const masterKey = party2MasterKeyShare.getPrivateKey();
   await credStash.putSecret({
     name: party2ChildShare.id,
     secret: JSON.stringify(masterKey),
   });
-  console.log('saved key', JSON.stringify(masterKey))
+  console.log("saved key", JSON.stringify(masterKey));
   const hex = party2ChildShare.getPublicKey().encode("hex", false);
   res.json({
     publicKey: hex,
