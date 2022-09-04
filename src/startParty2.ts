@@ -60,7 +60,7 @@ app.post("/sign", async (req, res, next) => {
     id: keyId,
     master_key: JSON.parse(key),
   });
-  const signature = await party2.sign(msg, party2ChildShare, 0, 0);
+  const signature = await party2.sign(msg, party2MasterShare, 0, 0);
   console.log(JSON.stringify(signature));
   res.json({
     r: signature.r,
