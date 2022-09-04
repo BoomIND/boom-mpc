@@ -56,6 +56,7 @@ app.post("/sign", async (req, res, next) => {
     next(new HttpException(404, "Not Found"));
     return;
   }
+  console.log("key", JSON.parse(key))
   const party2MasterShare = EcdsaParty2Share.fromPlain({
     id: keyId,
     master_key: JSON.parse(key),
@@ -78,6 +79,7 @@ app.post("/generateKey", async (req, res) => {
     name: party2ChildShare.id,
     secret: JSON.stringify(masterKey),
   });
+  console.log('saved key', JSON.stringify(masterKey))
   const hex = party2ChildShare.getPublicKey().encode("hex", false);
   res.json({
     publicKey: hex,
