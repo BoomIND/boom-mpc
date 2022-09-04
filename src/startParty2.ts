@@ -60,11 +60,14 @@ app.post("/sign", async (req, res, next) => {
     id: keyId,
     master_key: JSON.parse(key),
   });
-  const signature = await generateTwoPartyEcdsaSignature(msg, party2ChildShare);
+  const signature = await generateTwoPartyEcdsaSignature(
+    msg,
+    party2.getChildShare(party2ChildShare, 0, 0)
+  );
   res.json({
     r: signature.r,
     s: signature.s,
-    recid: signature.recid
+    recid: signature.recid,
   });
 });
 
