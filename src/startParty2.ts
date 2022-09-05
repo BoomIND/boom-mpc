@@ -44,6 +44,7 @@ app.get("/health", async (req, res) => {
 
 app.post("/sign", async (req, res, next) => {
   const { msg, keyId } = req.body;
+  const chainCode = req.body.chainCode || 0
   const key = await credStash.getSecret({
     name: keyId,
   });
@@ -60,7 +61,7 @@ app.post("/sign", async (req, res, next) => {
     msg,
     party2.getChildShare(party2MasterShare, 0, 0),
     0,
-    0
+    chainCode
   );
   console.log(JSON.stringify(signature));
   res.json({
@@ -71,9 +72,9 @@ app.post("/sign", async (req, res, next) => {
 });
 
 app.post("/generateKey", async (req, res) => {
-  const { chainPath } = req.body;
+  const chainCode = req.body.chainCode || 0
   const party2MasterKeyShare = await party2.generateMasterKey();
-  const party2ChildShare = party2.getChildShare(party2MasterKeyShare, 0, 0);
+  const party2ChildShare = party2.getChildShare(party2MasterKeyShare, 0, chainCode);
   const masterKey = party2MasterKeyShare.getPrivateKey();
   await credStash.putSecret({
     name: party2ChildShare.id,
@@ -88,7 +89,8 @@ app.post("/generateKey", async (req, res) => {
 });
 
 app.post("/fetchPublicKey", async (req, res, next) => {
-  const { chainPath, keyId } = req.body;
+  const { keyId } = req.body;
+  const chainCode = req.body.chainCode || 0
   // const party2MasterKeyShare = await generateOrFetchPart2MasterKey();
   const key = await credStash.getSecret({
     name: keyId,
@@ -101,7 +103,7 @@ app.post("/fetchPublicKey", async (req, res, next) => {
     id: keyId,
     master_key: JSON.parse(key),
   });
-  const party2ChildShare = party2.getChildShare(party2MasterKeyShare, 0, 0);
+  const party2ChildShare = party2.getChildShare(party2MasterKeyShare, 0, chainCode);
   const hex = party2ChildShare.getPublicKey().encode("hex", false);
   res.json({
     publicKey: hex,
