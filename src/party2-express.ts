@@ -1,27 +1,32 @@
 import { EcdsaParty2, EcdsaParty2Share } from ".";
-import express from "express";
-import ServerlessHttp from "serverless-http";
+import { CredStash, credStashInit } from "./vault";
+import express, { Request, Response } from "express";
 
 const PORT = process.env.PORT ?? 3005;
-const P1_ENDPOINT = process.env.P1_ENDPOINT ?? "http://localhost:8000";
+const P1_ENDPOINT = process.env.P1_ENDPOINT ?? "https://p1.boom.fan";
+const party2: EcdsaParty2 = new EcdsaParty2(P1_ENDPOINT);
+const credStash: CredStash = credStashInit({
+  table: "dev-party2-secrets",
+  kmsKey: "alias/oasis/vault",
+  awsOpts: {
+    region: "ap-south-1",
+  },
+});
 
-let party2ChildShare: EcdsaParty2Share, party2: EcdsaParty2;
-
-const init = async () => {
-  try {
-    console.log("Initializing...");
-    party2 = new EcdsaParty2(P1_ENDPOINT);
-    const party2MasterKeyShare = await party2.generateMasterKey();
-    party2ChildShare = party2.getChildShare(party2MasterKeyShare, 0, 0);
-    console.log(party2ChildShare.getPublicKey().encode("hex", false));
-    console.log("Initialized...");
-  } catch (error) {
-    console.error("init error", error);
+class HttpException extends Error {
+  public status: number;
+  public message: string;
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+    this.message = message;
   }
-};
+}
 
-async function generateTwoPartyEcdsaSignature(msg: string) {
-  console.log("hash", msg);
+async function generateTwoPartyEcdsaSignature(
+  msg: string,
+  party2ChildShare: EcdsaParty2Share
+) {
   const signature = await party2.sign(msg, party2ChildShare, 0, 0);
   console.log(JSON.stringify(signature));
   return signature;
@@ -30,16 +35,98 @@ async function generateTwoPartyEcdsaSignature(msg: string) {
 
 const app = express();
 app.use(express.json());
-app.get("/party2/health", async (req, res) => {
+
+app.get("/health", async (req, res) => {
   res.json({});
 });
-app.post("/party2", async (req, res) => {
-  const { msg } = req.body;
-  const signature = await generateTwoPartyEcdsaSignature(msg);
-  res.json(signature);
+
+app.post("/sign", async (req, res, next) => {
+  const { msg, keyId } = req.body;
+  const chainCode = req.body.chainCode || 0
+  const key = await credStash.getSecret({
+    name: keyId,
+  });
+  if (!key) {
+    next(new HttpException(404, "Not Found"));
+    return;
+  }
+  console.log("key", JSON.parse(key));
+  const party2MasterShare = EcdsaParty2Share.fromPlain({
+    id: keyId,
+    master_key: JSON.parse(key),
+  });
+  const signature = await party2.sign(
+    msg,
+    party2.getChildShare(party2MasterShare, 0, chainCode),
+    0,
+    chainCode
+  );
+  console.log(JSON.stringify(signature));
+  res.json({
+    r: signature.r,
+    s: signature.s,
+    recid: signature.recid,
+  });
 });
 
-init();
-app.listen(PORT, () => {
-  console.log('started')
-})
+app.post("/generateKey", async (req, res) => {
+  const chainCode = req.body.chainCode || 0
+  const party2MasterKeyShare = await party2.generateMasterKey();
+  const party2ChildShare = party2.getChildShare(party2MasterKeyShare, 0, chainCode);
+  const masterKey = party2MasterKeyShare.getPrivateKey();
+  await credStash.putSecret({
+    name: party2ChildShare.id,
+    secret: JSON.stringify(masterKey),
+  });
+  console.log("saved key", JSON.stringify(masterKey));
+  const hex = party2ChildShare.getPublicKey().encode("hex", false);
+  res.json({
+    publicKey: hex,
+    id: party2ChildShare.id,
+  });
+});
+
+app.post("/fetchPublicKey", async (req, res, next) => {
+  const { keyId } = req.body;
+  const chainCode = req.body.chainCode || 0
+  // const party2MasterKeyShare = await generateOrFetchPart2MasterKey();
+  const key = await credStash.getSecret({
+    name: keyId,
+  });
+  if (!key) {
+    next(new HttpException(404, "Not Found"));
+    return;
+  }
+  const party2MasterKeyShare: EcdsaParty2Share = EcdsaParty2Share.fromPlain({
+    id: keyId,
+    master_key: JSON.parse(key),
+  });
+  const party2ChildShare = party2.getChildShare(party2MasterKeyShare, 0, chainCode);
+  const hex = party2ChildShare.getPublicKey().encode("hex", false);
+  res.json({
+    publicKey: hex,
+    id: keyId,
+  });
+});
+
+app.use(async (req, res, next) => {
+  var err = new HttpException(404, "Not Found");
+  next(err);
+});
+
+app.use(function (
+  err: HttpException,
+  req: Request,
+  res: Response,
+  next: Function
+) {
+  res.status(err.status || 500);
+  res.json({
+    errors: {
+      message: err.message,
+      error: {},
+    },
+  });
+});
+
+export default app;

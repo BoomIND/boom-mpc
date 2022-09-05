@@ -26,6 +26,12 @@ provider:
       party2_server:
         path: ./
         platform: linux/amd64
+  vpc:
+    securityGroupIds:
+      - sg-0e23d8063cee9fc7a
+    subnetIds:
+      - subnet-08f2dc7b96e549323
+      - subnet-07bd9399c03e2ae09
   region: ap-south-1
   deploymentMethod: direct
   iam:
