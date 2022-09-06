@@ -3,15 +3,15 @@ frameworkVersion: "3"
 
 custom:
   tableName: "${sls:stage}_Party1MasterKey"
-  customDomain:
-    domainName: p2.boom.fan
-    certificateName: '*.boom.fan'
-    createRoute53Record: true
-    createRoute53IPv6Record: true
-    endpointType: 'regional'
-    securityPolicy: tls_1_2
-    apiType: http
-    autoDomain: true
+  # customDomain:
+  #   domainName: p2.boom.fan
+  #   certificateName: '*.boom.fan'
+  #   createRoute53Record: true
+  #   createRoute53IPv6Record: true
+  #   endpointType: 'regional'
+  #   securityPolicy: tls_1_2
+  #   apiType: http
+  #   autoDomain: true
 
 plugins:
   - serverless-domain-manager
