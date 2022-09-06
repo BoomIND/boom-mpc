@@ -65,10 +65,10 @@ functions:
         - dist/src/startParty2.handler
     events:
       # - httpApi: '*'
-      - http: GET health
-      - http: POST sign
-      - http: POST generateKey
-      - http: POST fetchPublicKey
+      - http: GET /health
+      - http: POST /sign
+      - http: POST /generateKey
+      - http: POST /fetchPublicKey
 
     environment:
       P1_ENDPOINT: https://p1.boom.fan/
