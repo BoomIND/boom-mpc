@@ -56,6 +56,13 @@ provider:
             - "arn:aws:kms:*:*:key/ffcd187a-801a-4991-9a3a-f0370be7eefe"
   environment:
     USERS_TABLE: ${self:custom.tableName}
+  apiGateway:
+    resourcePolicy:
+      - Effect: Allow
+        Principal: '*'
+        Action: execute-api:Invoke
+        Resource:
+          - execute-api:/*/*/*
 
 functions:
   api:
