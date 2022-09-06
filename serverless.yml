@@ -13,8 +13,8 @@ custom:
   #   apiType: http
   #   autoDomain: true
 
-plugins:
-  - serverless-domain-manager
+# plugins:
+#   - serverless-domain-manager
 
 provider:
   name: aws
