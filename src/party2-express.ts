@@ -23,16 +23,6 @@ class HttpException extends Error {
   }
 }
 
-async function generateTwoPartyEcdsaSignature(
-  msg: string,
-  party2ChildShare: EcdsaParty2Share
-) {
-  const signature = await party2.sign(msg, party2ChildShare, 0, 0);
-  console.log(JSON.stringify(signature));
-  return signature;
-  // {"r": <32-bytes-hex>,"s": <32-bytes-hex>,"recid": <0 or 1>}
-}
-
 const app = express();
 app.use(express.json());
 
@@ -57,8 +47,8 @@ app.post("/sign", async (req, res, next) => {
   });
   const signature = await party2.sign(
     msg,
-    party2.getChildShare(party2MasterShare, 0, chainCode),
-    0,
+    party2.getChildShare(party2MasterShare, 10, chainCode),
+    10,
     chainCode
   );
   console.log(JSON.stringify(signature));
@@ -72,7 +62,7 @@ app.post("/sign", async (req, res, next) => {
 app.post("/generateKey", async (req, res) => {
   const chainCode = req.body.chainCode || 0
   const party2MasterKeyShare = await party2.generateMasterKey();
-  const party2ChildShare = party2.getChildShare(party2MasterKeyShare, 0, chainCode);
+  const party2ChildShare = party2.getChildShare(party2MasterKeyShare, 10, chainCode);
   const masterKey = party2MasterKeyShare.getPrivateKey();
   await credStash.putSecret({
     name: party2ChildShare.id,
@@ -101,7 +91,7 @@ app.post("/fetchPublicKey", async (req, res, next) => {
     id: keyId,
     master_key: JSON.parse(key),
   });
-  const party2ChildShare = party2.getChildShare(party2MasterKeyShare, 0, chainCode);
+  const party2ChildShare = party2.getChildShare(party2MasterKeyShare, 10, chainCode);
   const hex = party2ChildShare.getPublicKey().encode("hex", false);
   res.json({
     publicKey: hex,

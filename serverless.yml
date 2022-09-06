@@ -19,8 +19,9 @@ plugins:
 provider:
   name: aws
   timeout: 15
-  httpApi:
-    disableDefaultEndpoint: true
+  endpointType: PRIVATE
+  vpcEndpointIds:
+    - vpce-0c016030d054a6b25
   ecr:
     images:
       party2_server:
@@ -63,7 +64,12 @@ functions:
       command:
         - dist/src/startParty2.handler
     events:
-      - httpApi: '*'
+      # - httpApi: '*'
+      - http: GET health
+      - http: POST sign
+      - http: POST generateKey
+      - http: POST fetchPublicKey
+
     environment:
       P1_ENDPOINT: https://p1.boom.fan/
 
