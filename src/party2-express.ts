@@ -2,7 +2,6 @@ import { EcdsaParty2, EcdsaParty2Share } from ".";
 import { CredStash, credStashInit } from "./vault";
 import express, { Request, Response } from "express";
 import axios from "axios";
-import aws4 from "aws4";
 
 const PORT = process.env.PORT ?? 3005;
 const P1_ENDPOINT = process.env.P1_ENDPOINT ?? "https://p1.boom.fan";
@@ -26,9 +25,10 @@ class HttpException extends Error {
 }
 
 const app = express();
+const router = express.Router()
 app.use(express.json());
 
-app.get("/dev/health", async (req, res, next) => {
+router.get("/health", async (req, res, next) => {
   try {
     const rsp = await axios.get(`${P1_ENDPOINT}/dev/health`);
     res.json({
@@ -40,7 +40,7 @@ app.get("/dev/health", async (req, res, next) => {
   }
 });
 
-app.post("/sign", async (req, res, next) => {
+router.post("/sign", async (req, res, next) => {
   const { msg, keyId } = req.body;
   const chainCode = req.body.chainCode || 0;
   const key = await credStash.getSecret({
@@ -69,7 +69,7 @@ app.post("/sign", async (req, res, next) => {
   });
 });
 
-app.post("/generateKey", async (req, res) => {
+router.post("/generateKey", async (req, res) => {
   const chainCode = req.body.chainCode || 0;
   const party2MasterKeyShare = await party2.generateMasterKey();
   const party2ChildShare = party2.getChildShare(
@@ -90,7 +90,7 @@ app.post("/generateKey", async (req, res) => {
   });
 });
 
-app.post("/fetchPublicKey", async (req, res, next) => {
+router.post("/fetchPublicKey", async (req, res, next) => {
   const { keyId } = req.body;
   const chainCode = req.body.chainCode || 0;
   // const party2MasterKeyShare = await generateOrFetchPart2MasterKey();
@@ -116,6 +116,8 @@ app.post("/fetchPublicKey", async (req, res, next) => {
     id: keyId,
   });
 });
+
+app.use('/dev', router)
 
 app.use(async (req, res, next) => {
   var err = new HttpException(404, "Not Found");
