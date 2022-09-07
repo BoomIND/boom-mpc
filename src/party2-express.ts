@@ -28,7 +28,7 @@ class HttpException extends Error {
 const app = express();
 app.use(express.json());
 
-app.get("/health", async (req, res, next) => {
+app.get("/dev/health", async (req, res, next) => {
   try {
     const rsp = await axios.get(`${P1_ENDPOINT}/health`);
     res.json({
