@@ -1,6 +1,7 @@
 import { EcdsaParty2, EcdsaParty2Share } from ".";
 import { CredStash, credStashInit } from "./vault";
 import express, { Request, Response } from "express";
+import axios from "axios";
 
 const PORT = process.env.PORT ?? 3005;
 const P1_ENDPOINT = process.env.P1_ENDPOINT ?? "https://p1.boom.fan";
@@ -26,13 +27,20 @@ class HttpException extends Error {
 const app = express();
 app.use(express.json());
 
-app.get("/health", async (req, res) => {
-  res.json({});
+app.get("/health", async (req, res, next) => {
+  try {
+    const rsp = await axios.get(`${P1_ENDPOINT}/health`);
+    res.json({
+      p1: rsp.status,
+    });
+  } catch (err) {
+    next(err)
+  }
 });
 
 app.post("/sign", async (req, res, next) => {
   const { msg, keyId } = req.body;
-  const chainCode = req.body.chainCode || 0
+  const chainCode = req.body.chainCode || 0;
   const key = await credStash.getSecret({
     name: keyId,
   });
@@ -60,9 +68,13 @@ app.post("/sign", async (req, res, next) => {
 });
 
 app.post("/generateKey", async (req, res) => {
-  const chainCode = req.body.chainCode || 0
+  const chainCode = req.body.chainCode || 0;
   const party2MasterKeyShare = await party2.generateMasterKey();
-  const party2ChildShare = party2.getChildShare(party2MasterKeyShare, 10, chainCode);
+  const party2ChildShare = party2.getChildShare(
+    party2MasterKeyShare,
+    10,
+    chainCode
+  );
   const masterKey = party2MasterKeyShare.getPrivateKey();
   await credStash.putSecret({
     name: party2ChildShare.id,
@@ -78,7 +90,7 @@ app.post("/generateKey", async (req, res) => {
 
 app.post("/fetchPublicKey", async (req, res, next) => {
   const { keyId } = req.body;
-  const chainCode = req.body.chainCode || 0
+  const chainCode = req.body.chainCode || 0;
   // const party2MasterKeyShare = await generateOrFetchPart2MasterKey();
   const key = await credStash.getSecret({
     name: keyId,
@@ -91,7 +103,11 @@ app.post("/fetchPublicKey", async (req, res, next) => {
     id: keyId,
     master_key: JSON.parse(key),
   });
-  const party2ChildShare = party2.getChildShare(party2MasterKeyShare, 10, chainCode);
+  const party2ChildShare = party2.getChildShare(
+    party2MasterKeyShare,
+    10,
+    chainCode
+  );
   const hex = party2ChildShare.getPublicKey().encode("hex", false);
   res.json({
     publicKey: hex,
