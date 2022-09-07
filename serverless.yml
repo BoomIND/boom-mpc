@@ -54,6 +54,11 @@ provider:
             - kms:Decrypt
           Resource:
             - "arn:aws:kms:*:*:key/ffcd187a-801a-4991-9a3a-f0370be7eefe"
+        - Effect: Allow
+          Action:
+            - execute-api:Invoke
+          Resource:
+            - "arn:aws:execute-api:ap-south-1:*:5edb7ygj70/*"
   environment:
     USERS_TABLE: ${self:custom.tableName}
   apiGateway:
@@ -82,6 +87,19 @@ functions:
 
 resources:
   Resources:
+    # VPCEndpoint:
+    #   Type: AWS::EC2::VPCEndpoint
+    #   Properties:
+    #     PolicyDocument: {}
+    #     PrivateDnsEnabled: True
+    #     SecurityGroupIds:
+    #       - sg-0e23d8063cee9fc7a
+    #       - sg-0b1f66d9b3511abb9
+    #     SubnetIds:
+    #       - subnet-08f2dc7b96e549323
+    #       - subnet-07bd9399c03e2ae09
+    #     VpcId: vpc-0080d67ade82e5b42
+    #     VpcEndpointType: Interface
     Party2Secrets:
       Type: AWS::DynamoDB::Table
       Properties:
