@@ -32,7 +32,7 @@ app.use(express.json());
 
 router.get("/health", async (req, res, next) => {
   try {
-    const rsp = await axios.get(`${P1_ENDPOINT}/dev/health`);
+    const rsp = await axios.get(`${P1_ENDPOINT}/health`);
     res.json({
       p1: rsp.status,
     });

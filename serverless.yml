@@ -85,7 +85,7 @@ functions:
 
     environment:
       #TODO this id should not be hard coded
-      P1_ENDPOINT: https://5kfdm8mbl2.execute-api.ap-south-1.amazonaws.com
+      P1_ENDPOINT: https://5kfdm8mbl2.execute-api.ap-south-1.amazonaws.com/dev
 
 resources:
   Resources:
