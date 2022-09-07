@@ -30,7 +30,7 @@ app.use(express.json());
 
 app.get("/dev/health", async (req, res, next) => {
   try {
-    const rsp = await axios.get(`${P1_ENDPOINT}/health`);
+    const rsp = await axios.get(`${P1_ENDPOINT}/dev/health`);
     res.json({
       p1: rsp.status,
     });
