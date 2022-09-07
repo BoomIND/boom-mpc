@@ -2,6 +2,7 @@ import { EcdsaParty2, EcdsaParty2Share } from ".";
 import { CredStash, credStashInit } from "./vault";
 import express, { Request, Response } from "express";
 import axios from "axios";
+import morgan from "morgan";
 
 const PORT = process.env.PORT ?? 3005;
 const P1_ENDPOINT = process.env.P1_ENDPOINT ?? "https://p1.boom.fan";
@@ -26,6 +27,7 @@ class HttpException extends Error {
 
 const app = express();
 const router = express.Router()
+app.use(morgan('combined'))
 app.use(express.json());
 
 router.get("/health", async (req, res, next) => {
