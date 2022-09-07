@@ -2,6 +2,7 @@ import { EcdsaParty2, EcdsaParty2Share } from ".";
 import { CredStash, credStashInit } from "./vault";
 import express, { Request, Response } from "express";
 import axios from "axios";
+import aws4 from "aws4";
 
 const PORT = process.env.PORT ?? 3005;
 const P1_ENDPOINT = process.env.P1_ENDPOINT ?? "https://p1.boom.fan";
@@ -29,12 +30,25 @@ app.use(express.json());
 
 app.get("/health", async (req, res, next) => {
   try {
-    const rsp = await axios.get(`${P1_ENDPOINT}/health`);
+    const request = {
+      host: P1_ENDPOINT.replace("https://", ""),
+      method: "GET",
+      url: `${P1_ENDPOINT}/health`,
+      path: "/health",
+    };
+    const signedRequest = aws4.sign(request, {
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    });
+    delete signedRequest.headers["Host"];
+    delete signedRequest.headers["Content-Length"];
+    const rsp = await axios(signedRequest);
     res.json({
       p1: rsp.status,
     });
   } catch (err) {
-    next(err)
+    console.error("error while calling p1", err);
+    next(err);
   }
 });
 
