@@ -30,24 +30,12 @@ app.use(express.json());
 
 app.get("/health", async (req, res, next) => {
   try {
-    const request = {
-      host: P1_ENDPOINT.replace("https://", ""),
-      method: "GET",
-      url: `${P1_ENDPOINT}/health`,
-      path: "/health",
-    };
-    const signedRequest = aws4.sign(request, {
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    });
-    delete signedRequest.headers["Host"];
-    delete signedRequest.headers["Content-Length"];
-    const rsp = await axios(signedRequest);
+    const rsp = await axios.get(`${P1_ENDPOINT}/health`);
     res.json({
       p1: rsp.status,
     });
   } catch (err) {
-    console.error("error while calling p1", err);
+    console.error('error while calling p1', err)
     next(err);
   }
 });
