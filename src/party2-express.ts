@@ -119,7 +119,7 @@ router.post("/fetchPublicKey", async (req, res, next) => {
   });
 });
 
-app.use('/dev', router)
+app.use('/', router)
 
 app.use(async (req, res, next) => {
   var err = new HttpException(404, "Not Found");
