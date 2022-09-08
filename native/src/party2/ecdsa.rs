@@ -31,7 +31,6 @@ pub fn generate_master_key(mut cx: FunctionContext) -> JsResult<JsPromise> {
 
         let client_shim = ClientShim::new(p1_endpoint.to_string(), None);
         let master_key_share = get_master_key(&client_shim);
-
         deferred.settle_with(&channel, move |mut cx| {
             let val = cx.string(serde_json::to_string(&master_key_share).unwrap());
             Ok(val)

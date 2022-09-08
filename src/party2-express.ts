@@ -71,25 +71,29 @@ router.post("/sign", async (req, res, next) => {
   });
 });
 
-router.post("/generateKey", async (req, res) => {
-  const chainCode = req.body.chainCode || 0;
-  const party2MasterKeyShare = await party2.generateMasterKey();
-  const party2ChildShare = party2.getChildShare(
-    party2MasterKeyShare,
-    10,
-    chainCode
-  );
-  const masterKey = party2MasterKeyShare.getPrivateKey();
-  await credStash.putSecret({
-    name: party2ChildShare.id,
-    secret: JSON.stringify(masterKey),
-  });
-  console.log("saved key", JSON.stringify(masterKey));
-  const hex = party2ChildShare.getPublicKey().encode("hex", false);
-  res.json({
-    publicKey: hex,
-    id: party2ChildShare.id,
-  });
+router.post("/generateKey", async (req, res, next) => {
+  try {
+    const chainCode = req.body.chainCode || 0;
+    const party2MasterKeyShare = await party2.generateMasterKey();
+    const party2ChildShare = party2.getChildShare(
+      party2MasterKeyShare,
+      10,
+      chainCode
+    );
+    const masterKey = party2MasterKeyShare.getPrivateKey();
+    await credStash.putSecret({
+      name: party2ChildShare.id,
+      secret: JSON.stringify(masterKey),
+    });
+    console.log("saved key", JSON.stringify(masterKey));
+    const hex = party2ChildShare.getPublicKey().encode("hex", false);
+    res.json({
+      publicKey: hex,
+      id: party2ChildShare.id,
+    });
+  } catch (err) {
+    next(err)
+  }
 });
 
 router.post("/fetchPublicKey", async (req, res, next) => {
