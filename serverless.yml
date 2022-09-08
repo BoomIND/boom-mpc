@@ -27,8 +27,8 @@ provider:
     securityGroupIds:
       - sg-0e23d8063cee9fc7a
     subnetIds:
-      # - subnet-08f2dc7b96e549323
-      - subnet-07bd9399c03e2ae09
+      - subnet-08f2dc7b96e549323
+      # - subnet-07bd9399c03e2ae09
   ecr:
     images:
       party2_server:
