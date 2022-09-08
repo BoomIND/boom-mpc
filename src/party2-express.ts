@@ -99,10 +99,12 @@ router.post("/generateKey", async (req, res, next) => {
 router.post("/fetchPublicKey", async (req, res, next) => {
   const { keyId } = req.body;
   const chainCode = req.body.chainCode || 0;
-  // const party2MasterKeyShare = await generateOrFetchPart2MasterKey();
+  
+  console.log('/fetchPublicKey', keyId)
   const key = await credStash.getSecret({
     name: keyId,
   });
+  console.log('got key from vault')
   if (!key) {
     next(new HttpException(404, "Not Found"));
     return;
@@ -116,6 +118,7 @@ router.post("/fetchPublicKey", async (req, res, next) => {
     10,
     chainCode
   );
+  console.log('got child share')
   const hex = party2ChildShare.getPublicKey().encode("hex", false);
   res.json({
     publicKey: hex,
