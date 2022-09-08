@@ -1,6 +1,6 @@
 #!/bin/bash
 
-gh api -H "Accept: application/vnd.github+json" \
+gh api -H "Accept: application/vnd.github+json" --paginate \
         /repos/boomll/mpc/actions/caches \
         | for ID in `jq '.actions_caches[].id'`; \
           do echo "Deleting $ID"; \
