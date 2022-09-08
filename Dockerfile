@@ -51,7 +51,7 @@ COPY tsconfig.json tsconfig.json
 RUN npm run build-ts
 
 ENV RUST_BACKTRACE 1
-ENV RUST_LOG trace
+ENV RUST_LOG "trace,client_lib=trace,gotham-client=trace"
 
 ENTRYPOINT ["npx", "aws-lambda-ric"]
 CMD [ "/dist/src/startParty2.handler" ]
