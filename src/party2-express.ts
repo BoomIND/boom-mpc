@@ -139,6 +139,7 @@ app.use(function (
   res: Response,
   next: Function
 ) {
+  console.error('Error', err)
   res.status(err.status || 500);
   res.json({
     errors: {
