@@ -26,8 +26,8 @@ class HttpException extends Error {
 }
 
 const app = express();
-const router = express.Router()
-app.use(morgan('combined'))
+const router = express.Router();
+app.use(morgan("combined"));
 app.use(express.json());
 
 router.get("/health", async (req, res, next) => {
@@ -37,14 +37,14 @@ router.get("/health", async (req, res, next) => {
       p1: rsp.status,
     });
   } catch (err) {
-    console.error('error while calling p1', err)
+    console.error("error while calling p1", err);
     next(err);
   }
 });
 
 router.post("/sign", async (req, res, next) => {
   const { msg, keyId } = req.body;
-  const chainCode = req.body.chainCode || 0;
+  const chainPath = req.body.chainPath || [0, 0];
   const key = await credStash.getSecret({
     name: keyId,
   });
@@ -59,9 +59,9 @@ router.post("/sign", async (req, res, next) => {
   });
   const signature = await party2.sign(
     msg,
-    party2.getChildShare(party2MasterShare, 10, chainCode),
-    10,
-    chainCode
+    party2.getChildShare(party2MasterShare, chainPath[0], chainPath[1]),
+    chainPath[0],
+    chainPath[1]
   );
   console.log(JSON.stringify(signature));
   res.json({
@@ -73,12 +73,12 @@ router.post("/sign", async (req, res, next) => {
 
 router.post("/generateKey", async (req, res, next) => {
   try {
-    const chainCode = req.body.chainCode || 0;
+    const chainPath = req.body.chainPath || [0, 0];
     const party2MasterKeyShare = await party2.generateMasterKey();
     const party2ChildShare = party2.getChildShare(
       party2MasterKeyShare,
-      10,
-      chainCode
+      chainPath[0],
+      chainPath[1]
     );
     const masterKey = party2MasterKeyShare.getPrivateKey();
     await credStash.putSecret({
@@ -92,19 +92,19 @@ router.post("/generateKey", async (req, res, next) => {
       id: party2ChildShare.id,
     });
   } catch (err) {
-    next(err)
+    next(err);
   }
 });
 
 router.post("/fetchPublicKey", async (req, res, next) => {
   const { keyId } = req.body;
-  const chainCode = req.body.chainCode || 0;
-  
-  console.log('/fetchPublicKey', keyId)
+  const chainPath = req.body.chainPath || [0, 0];
+
+  console.log("/fetchPublicKey", keyId);
   const key = await credStash.getSecret({
     name: keyId,
   });
-  console.log('got key from vault')
+  console.log("got key from vault");
   if (!key) {
     next(new HttpException(404, "Not Found"));
     return;
@@ -115,10 +115,10 @@ router.post("/fetchPublicKey", async (req, res, next) => {
   });
   const party2ChildShare = party2.getChildShare(
     party2MasterKeyShare,
-    10,
-    chainCode
+    chainPath[0],
+    chainPath[1]
   );
-  console.log('got child share')
+  console.log("got child share");
   const hex = party2ChildShare.getPublicKey().encode("hex", false);
   res.json({
     publicKey: hex,
@@ -126,7 +126,7 @@ router.post("/fetchPublicKey", async (req, res, next) => {
   });
 });
 
-app.use('/', router)
+app.use("/", router);
 
 app.use(async (req, res, next) => {
   var err = new HttpException(404, "Not Found");
@@ -139,7 +139,7 @@ app.use(function (
   res: Response,
   next: Function
 ) {
-  console.error('Error', err)
+  console.error("Error", err);
   res.status(err.status || 500);
   res.json({
     errors: {

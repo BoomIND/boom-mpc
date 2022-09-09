@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mpc
+  namespace: default
+spec:
+  type: ExternalName
+  externalName: j33cxwpvof.execute-api.ap-south-1.amazonaws.com

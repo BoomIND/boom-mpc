@@ -1,7 +1,7 @@
 FROM lukemathwalker/cargo-chef:latest-rust-1.57.0-bullseye as node-base
 
 # Install node
-RUN apt update && apt -y install curl dirmngr apt-transport-https lsb-release ca-certificates
+RUN apt update && apt -y install curl dirmngr apt-transport-https lsb-release ca-certificates g++ make cmake unzip libcurl4-openssl-dev
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 RUN apt update && apt install -y nodejs
 
@@ -9,8 +9,7 @@ FROM node-base as rust-node-base
 
 RUN apt install -y make build-essential pkg-config openssl libssl-dev libreadline-dev libsqlite3-dev clang libgmp-dev
 
-RUN npm i -g neon-cli
-RUN npm install -g cargo-cp-artifact
+RUN npm i -g neon-cli cargo-cp-artifact
 
 FROM rust-node-base as rust-planner
 WORKDIR /dist
@@ -29,13 +28,6 @@ RUN cargo-cp-artifact -ac mpc ./native/index.node -- cargo build --message-forma
 RUN ls ./native/
 
 FROM node-base as rust-node-final
-# needed for aws runtime
-RUN apt-get update && apt install -y \ 
-    g++ \
-    make \
-    cmake \
-    unzip \
-    libcurl4-openssl-dev
 
 WORKDIR /dist
 RUN mkdir -p native
