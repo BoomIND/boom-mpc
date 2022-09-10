@@ -67,7 +67,7 @@ router.post("/sign", async (req, res, next) => {
   res.json({
     r: signature.r,
     s: signature.s,
-    recid: signature.recid,
+    recoveryParam: signature.recid,
   });
 });
 
