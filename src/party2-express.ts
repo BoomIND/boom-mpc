@@ -44,7 +44,7 @@ router.get("/health", async (req, res, next) => {
 
 router.post("/sign", async (req, res, next) => {
   const { msg, keyId } = req.body;
-  const chainPath = req.body.chainPath || [0, 0];
+  const chainPath = [0, 0]//req.body.chainPath || [0, 0];
   console.log(`Signing with ${keyId}, ${JSON.stringify(chainPath)} -> ${msg}`)
   const key = await credStash.getSecret({
     name: keyId,
@@ -74,7 +74,7 @@ router.post("/sign", async (req, res, next) => {
 
 router.post("/generateKey", async (req, res, next) => {
   try {
-    const chainPath = req.body.chainPath || [0, 0];
+    const chainPath = [0, 0] //req.body.chainPath || [0, 0];
     const party2MasterKeyShare = await party2.generateMasterKey();
     const party2ChildShare = party2.getChildShare(
       party2MasterKeyShare,
@@ -99,9 +99,9 @@ router.post("/generateKey", async (req, res, next) => {
 
 router.post("/fetchPublicKey", async (req, res, next) => {
   const { keyId } = req.body;
-  const chainPath = req.body.chainPath || [0, 0];
+  const chainPath = [0, 0] // req.body.chainPath || [0, 0];
 
-  console.log("/fetchPublicKey", keyId);
+  console.log(`/fetchPublicKey ${keyId}, ${JSON.stringify(chainPath)}`);
   const key = await credStash.getSecret({
     name: keyId,
   });
