@@ -44,6 +44,7 @@ router.get("/health", async (req, res, next) => {
 
 router.post("/sign", async (req, res, next) => {
   const { msg, keyId } = req.body;
+  console.log(`Signing with ${keyId} -> ${msg} `)
   const chainPath = req.body.chainPath || [0, 0];
   const key = await credStash.getSecret({
     name: keyId,
@@ -63,7 +64,7 @@ router.post("/sign", async (req, res, next) => {
     chainPath[0],
     chainPath[1]
   );
-  console.log(JSON.stringify(signature));
+  console.log('signature', JSON.stringify(signature));
   res.json({
     r: signature.r,
     s: signature.s,
