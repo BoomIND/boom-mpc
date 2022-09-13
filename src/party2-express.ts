@@ -47,11 +47,16 @@ router.post("/sign", async (req, res, next) => {
     const { msg, keyId } = req.body;
     const chainPath = [0, 0]//req.body.chainPath || [0, 0];
     console.log(`Signing with ${keyId}, ${JSON.stringify(chainPath)} -> ${msg}`)
-    const key = await credStash.getSecret({
-      name: keyId,
-    });
+    let key;
+    try {
+      key = await credStash.getSecret({
+        name: keyId,
+      });
+    } catch (err) {
+      console.error('could not fetch key from dynamodb', err)
+    }
     if (!key) {
-      next(new HttpException(404, "Not Found"));
+      next(new HttpException(409, "Key Not Found"));
       return;
     }
     console.log("key", JSON.parse(key));
