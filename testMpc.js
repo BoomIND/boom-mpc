@@ -16,7 +16,7 @@ const main = async () => {
     for (var i =0; i<10; i++) {
       const sign = (
         await axios.post(`${baseUrl}/sign`, {
-          keyId: id,
+          keyId: 'f83eb11d-4436-4579-b0c9-e8cece3d8a02',
           msg: `5d9f06235dc98bf33efda3d575c8f8be0301fd73ab14a16f63c0623ed4ec741${i}`,
         })
       ).data;
