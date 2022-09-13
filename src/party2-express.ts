@@ -43,33 +43,37 @@ router.get("/health", async (req, res, next) => {
 });
 
 router.post("/sign", async (req, res, next) => {
-  const { msg, keyId } = req.body;
-  const chainPath = [0, 0]//req.body.chainPath || [0, 0];
-  console.log(`Signing with ${keyId}, ${JSON.stringify(chainPath)} -> ${msg}`)
-  const key = await credStash.getSecret({
-    name: keyId,
-  });
-  if (!key) {
-    next(new HttpException(404, "Not Found"));
-    return;
+  try {
+    const { msg, keyId } = req.body;
+    const chainPath = [0, 0]//req.body.chainPath || [0, 0];
+    console.log(`Signing with ${keyId}, ${JSON.stringify(chainPath)} -> ${msg}`)
+    const key = await credStash.getSecret({
+      name: keyId,
+    });
+    if (!key) {
+      next(new HttpException(404, "Not Found"));
+      return;
+    }
+    console.log("key", JSON.parse(key));
+    const party2MasterShare = EcdsaParty2Share.fromPlain({
+      id: keyId,
+      master_key: JSON.parse(key),
+    });
+    const signature = await party2.sign(
+      msg,
+      party2.getChildShare(party2MasterShare, chainPath[0], chainPath[1]),
+      chainPath[0],
+      chainPath[1]
+    );
+    console.log('signature', JSON.stringify(signature));
+    res.json({
+      r: signature.r,
+      s: signature.s,
+      recoveryParam: signature.recid,
+    });
+  } catch (err) {
+    next(err)
   }
-  console.log("key", JSON.parse(key));
-  const party2MasterShare = EcdsaParty2Share.fromPlain({
-    id: keyId,
-    master_key: JSON.parse(key),
-  });
-  const signature = await party2.sign(
-    msg,
-    party2.getChildShare(party2MasterShare, chainPath[0], chainPath[1]),
-    chainPath[0],
-    chainPath[1]
-  );
-  console.log('signature', JSON.stringify(signature));
-  res.json({
-    r: signature.r,
-    s: signature.s,
-    recoveryParam: signature.recid,
-  });
 });
 
 router.post("/generateKey", async (req, res, next) => {
