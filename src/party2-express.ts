@@ -5,7 +5,7 @@ import axios from "axios";
 import morgan from "morgan";
 
 const PORT = process.env.PORT ?? 3005;
-const P1_ENDPOINT = process.env.P1_ENDPOINT ?? "http://localhost:8000";
+const P1_ENDPOINT = process.env.P1_ENDPOINT ?? "http://localhost:8000/dev";
 const party2: EcdsaParty2 = new EcdsaParty2(P1_ENDPOINT);
 const credStash: CredStash = credStashInit({
   table: "dev-party2-secrets",
