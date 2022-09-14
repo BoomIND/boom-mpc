@@ -1038,7 +1038,7 @@ checksum = "9b919933a397b79c37e33b77bb2aa3dc8eb6e165ad809e58ff75bc7db2e34574"
 [[package]]
 name = "gotham-client"
 version = "0.1.0"
-source = "git+https://github.com/boomll/gotham-city?rev=81e8fbf1d4e6d8bd62c75cd601e720764b0a7a66#81e8fbf1d4e6d8bd62c75cd601e720764b0a7a66"
+source = "git+https://github.com/boomll/gotham-city?rev=55fe3febb80906053d789ae84dbe5b49f13a0c12#55fe3febb80906053d789ae84dbe5b49f13a0c12"
 dependencies = [
  "base64 0.13.0",
  "failure",
