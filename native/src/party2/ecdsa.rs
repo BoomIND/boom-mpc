@@ -57,6 +57,8 @@ pub fn get_child_share(mut cx: FunctionContext) -> JsResult<JsString> {
 }
 
 pub fn sign(mut cx: FunctionContext) -> JsResult<JsPromise> {
+    let rt = runtime(&mut cx)?;
+    let channel = cx.channel();
     let expected_args = 5;
     if cx.len() != expected_args {
         return cx.throw_error("Invalid number of arguments");
@@ -74,19 +76,22 @@ pub fn sign(mut cx: FunctionContext) -> JsResult<JsPromise> {
     let x: BigInt = serde_json::from_str(&cx.argument::<JsString>(3)?.value(&mut cx)).unwrap();
     let y: BigInt = serde_json::from_str(&cx.argument::<JsString>(4)?.value(&mut cx)).unwrap();
 
-    let client_shim = ClientShim::new(p1_endpoint.to_string(), None);
-    let signature = client_lib::ecdsa::sign(
-        &client_shim,
-        msg_hash.clone(),
-        &share.master_key,
-        x.clone(),
-        y.clone(),
-        &share.id,
-    )
-    .expect("ECDSA signature failed");
-
-    let val = cx.string(serde_json::to_string(&signature).unwrap());
-    deferred.resolve(&mut cx, val);
-
+    rt.spawn(async move {
+        let client_shim = ClientShim::new(p1_endpoint.to_string(), None);
+        let signature = client_lib::ecdsa::sign(
+            &client_shim,
+            msg_hash.clone(),
+            &share.master_key,
+            x.clone(),
+            y.clone(),
+            &share.id,
+        );
+        deferred.settle_with(&channel, move |mut cx| {
+            match signature {
+                Ok(val) => Ok(cx.string(serde_json::to_string(&val).unwrap())),
+                Err(err) => cx.throw_error(format!("msg {}", err.to_string())),
+            }
+        });
+    });
     Ok(promise)
 }
