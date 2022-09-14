@@ -36,6 +36,11 @@ provider:
         platform: linux/amd64
   region: ap-south-1
   deploymentMethod: direct
+  tracing:
+    # Can only be true if API Gateway is inside a stack.
+    apiGateway: true
+    # Optional, can be true (true equals 'Active'), 'Active' or 'PassThrough'
+    lambda: true
   iam:
     role:
       statements:
